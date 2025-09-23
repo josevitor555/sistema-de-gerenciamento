@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Categorias{% endblock %}
+
+{% block header_actions %}
+<a href="{% url 'categoria_create' %}" class="btn btn-primary">
+    <i class="fas fa-plus"></i>
+    Nova Categoria
+</a>
+{% endblock %}
+
+{% block content %}
+<!-- Search Section -->
+<div class="search-section">
+    <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchCategory" placeholder="Pesquisar categorias..." oninput="filterCategories()">
+    </div>
+</div>
+
+<!-- Categories Table -->
+{% if categorias %}
+<table class="data-table">
+    <thead>
+        <tr>
+            <th>NOME</th>
+            <th>DESCRIÇÃO</th>
+            <th>PRODUTOS</th>
+            <th>AÇÕES</th>
+        </tr>
+    </thead>
+    <tbody id="categoryTableBody">
+        {% for categoria in categorias %}
+        <tr class="category-row">
+            <td>
+                <div class="product-name">{{ categoria.nome }}</div>
+            </td>
+            <td>
+                <span class="category-tag">{{ categoria.descricao|default:"--" }}</span>
+            </td>
+            <td>
+                <span class="price">{{ categoria.produto_set.count }} produto{{ categoria.produto_set.count|pluralize }}</span>
+            </td>
+            <td>
+                <div class="actions">
+                    <a href="{% url 'categoria_update' categoria.id %}" class="action-btn edit-btn" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'categoria_delete' categoria.id %}" class="action-btn delete-btn" title="Excluir">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-tags"></i>
+    <h3>Nenhuma categoria encontrada</h3>
+    <p>Clique em "Nova Categoria" para começar</p>
+</div>
+{% endif %}
+
+<script>
+function filterCategories() {
+    const searchTerm = document.getElementById("searchCategory").value.toLowerCase();
+    const categories = document.querySelectorAll(".category-row");
+    let found = false;
+
+    categories.forEach(category => {
+        const categoryName = category.querySelector(".product-name").textContent.toLowerCase();
+
+        if (categoryName.includes(searchTerm)) {
+            category.style.display = "";
+            found = true;
+        } else {
+            category.style.display = "none";
+        }
+    });
+
+    const table = document.querySelector(".data-table");
+    if (!found && searchTerm) {
+        if (table) table.style.display = "none";
+    } else {
+        if (table) table.style.display = "table";
+    }
+}
+</script>
+{% endblock %}

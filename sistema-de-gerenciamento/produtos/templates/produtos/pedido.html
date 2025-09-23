@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Pedido</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        input, select {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul li {
+            background-color: #fff;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .item-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .item-container a {
+            background-color: #ff0000;
+            color: white;
+            padding: 5px 10px;
+            text-decoration: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .item-container a:hover {
+            background-color: #cc0000;
+        }
+    </style>
+</head>
+<body>
+   <h1>Cadastro de Pedido</h1>
+    <form method="POST" action="{% url 'pedido_create' %}">
+        {% csrf_token %}
+        <label for="produto">Produto:</label>
+        <select id="produto" name="produto">
+            {% for produto in produtos %}
+                <option value="{{ produto.id }}">{{ produto.nome }} - R$ {{ produto.valor }}</option>
+            {% endfor %}
+        </select>
+
+        <label for="quantidade">Quantidade:</label>
+        <input type="number" id="quantidade" name="quantidade" value="1">
+
+        <button type="submit">Adicionar ao Pedido</button>
+    </form>
+
+    <h2>Itens no Pedido</h2>
+    {% if pedido.itempedido_set.all %}
+        <ul>
+            {% for item_pedido in pedido.itempedido_set.all %}
+                <li class="item-container">
+                    {{ item_pedido.produto.nome }} - Quantidade: {{ item_pedido.quantidade }} - Preço: R$ {{ item_pedido.produto.valor }}
+                    <div>
+                        <a href="{% url 'pedido_update' item_pedido.id 'decrement' %}">-</a>
+                        <a href="{% url 'pedido_update' item_pedido.id 'increment' %}">+</a>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+        <p>Total: R$ {{ pedido.total_pedido }}</p>
+    {% else %}
+        <p>Nenhum item no pedido.</p>
+    {% endif %}
+</body>
+</html>

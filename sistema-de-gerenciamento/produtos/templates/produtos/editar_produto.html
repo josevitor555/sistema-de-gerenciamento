@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Editar Produto</title>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap"
+    rel="stylesheet"
+  />
+  <link
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+    rel="stylesheet"
+  />
+
+  <style>
+    /* Fundo gradiente rosa e verde claro em toda a tela */
+    body {
+      margin: 0;
+      height: 100vh;
+      font-family: "Roboto", Arial, sans-serif;
+      background: linear-gradient(135deg, #f8b9c4 0%, #d1f0e3 100%);
+      display: flex;
+      overflow: hidden;
+      color: #333;
+      position: relative;
+    }
+
+    /* Seta voltar fixa no topo esquerdo da tela (alterada para SVG) */
+    .back-button {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #d94f4f;
+      font-weight: 700;
+      text-decoration: none;
+      z-index: 1000;
+      transition: color 0.3s ease;
+      background: rgba(217, 79, 79, 0.1);
+      border-radius: 50%;
+    }
+
+    .back-button:hover {
+      color: #a53636;
+      background: rgba(165, 54, 54, 0.2);
+    }
+
+    /* Container principal dividindo tela em 2 colunas sem bordas e sombra */
+    .container {
+      display: flex;
+      width: 100%;
+      height: 100vh;
+    }
+
+    /* Lado esquerdo: imagem ilustrativa com fundo transparente, sem borda */
+    .image-side {
+      width: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    /* Estilo do SVG */
+    .image-side svg {
+      width: 60%;
+      height: auto;
+      fill: #d94f4f;
+      stroke: #a53636;
+      stroke-width: 2;
+    }
+
+    /* Lado direito: formulário com fundo transparente, sem borda nem sombra */
+    form {
+      width: 50%;
+      padding: 40px 50px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      background: transparent;
+      color: #333;
+    }
+
+    label {
+      font-weight: 500;
+      font-size: 14px;
+      margin-bottom: 6px;
+      color: #444;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select,
+    input[type="file"] {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.8px solid #d94f4f;
+      border-radius: 10px;
+      font-size: 15px;
+      font-family: "Roboto", Arial, sans-serif;
+      box-sizing: border-box;
+      transition: border-color 0.3s ease;
+      color: #222;
+      background: #fff;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    textarea:focus,
+    select:focus,
+    input[type="file"]:focus {
+      border-color: #a53636;
+      outline: none;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+      font-size: 15px;
+    }
+
+    button {
+      background-color: #d94f4f;
+      color: white;
+      padding: 14px 20px;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-top: 10px;
+      width: 100%;
+    }
+
+    button:hover {
+      background-color: #a53636;
+    }
+
+    /* Container para imagem atual do produto dentro do form */
+    .current-image-container {
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .current-image {
+      max-width: 120px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .message {
+      font-weight: 700;
+      margin-top: 10px;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .message.success {
+      color: #2e7d32;
+    }
+
+    .message.error {
+      color: #b71c1c;
+    }
+
+    /* Scroll só se necessário no form */
+    @media (max-width: 900px) {
+      body {
+        flex-direction: column;
+        overflow-y: auto;
+      }
+
+      .container {
+        flex-direction: column;
+        height: auto;
+      }
+
+      form,
+      .image-side {
+        width: 100%;
+        border-radius: 0;
+        box-shadow: none;
+        padding: 20px;
+      }
+
+      .image-side {
+        height: 250px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <a href="{% url 'produto_list' %}" class="back-button" title="Voltar" aria-label="Voltar">
+    <!-- SVG seta voltar moderna -->
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="3"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      viewBox="0 0 24 24"
+      width="20"
+      height="20"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path d="M15 18l-6-6 6-6" />
+    </svg>
+  </a>
+
+  <div class="container">
+    <div class="image-side" aria-label="Imagem ilustrativa de edição">
+      <!-- SVG personalizado representando edição: lápis e folha -->
+      <svg
+        viewBox="0 0 64 64"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        role="img"
+      >
+        <rect x="10" y="12" width="30" height="40" rx="4" ry="4" fill="#f8b9c4" />
+        <line x1="15" y1="18" x2="35" y2="18" stroke="#a53636" stroke-width="2" />
+        <line x1="15" y1="25" x2="35" y2="25" stroke="#a53636" stroke-width="2" />
+        <line x1="15" y1="32" x2="35" y2="32" stroke="#a53636" stroke-width="2" />
+        <path
+          d="M 42 14 L 52 24 L 37 39 L 27 29 Z"
+          fill="#d94f4f"
+          stroke="#a53636"
+          stroke-width="2"
+          stroke-linejoin="round"
+        />
+        <line x1="47" y1="19" x2="39" y2="27" stroke="#a53636" stroke-width="2" />
+      </svg>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" action="">
+      {% csrf_token %}
+
+      <div>
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" name="nome" value="{{ produto.nome }}" required />
+      </div>
+
+      <div>
+        <label for="descricao">Descrição:</label>
+        <textarea id="descricao" name="descricao" required>{{ produto.descricao }}</textarea>
+      </div>
+
+      <label for="categoria">Categoria:</label>
+      <select name="categoria" id="categoria">
+        {% for cat in categorias %}
+        <option value="{{ cat.id }}" {% if cat in produto.categorias.all %}selected{% endif %}>
+          {{ cat.nome }}
+        </option>
+        {% endfor %}
+      </select>
+
+      <div>
+        <label for="valor">Valor:</label>
+        <input
+          type="text"
+          id="valor"
+          name="valor"
+          value="{{ produto.valor }}"
+          required
+          pattern="^\d+(\.\d{1,2})?$"
+          title="Digite um valor numérico, ex: 15.50"
+        />
+      </div>
+
+      <div>
+        <label for="adicional">Status:</label>
+        <select id="adicional" name="adicional" required>
+          <option value="disponivel" {% if produto.adicional == "disponivel" %}selected{% endif %}>
+            Disponível
+          </option>
+          <option value="nao_disponivel" {% if produto.adicional == "nao_disponivel" %}selected{% endif %}>
+            Não disponível
+          </option>
+        </select>
+      </div>
+
+      <div>
+        <label for="imagem">Imagem:</label>
+        <input type="file" id="imagem" name="imagem" accept="image/*" />
+        <div class="current-image-container">
+          {% if produto.imagem %}
+          <img
+            id="current-image"
+            class="current-image"
+            src="{{ produto.imagem.url }}"
+            alt="Imagem Atual do Produto"
+          />
+          {% else %}
+          <p>Sem imagem atual</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <button type="submit">Salvar Alterações</button>
+
+      <div id="message" class="message" style="display:none;"></div>
+    </form>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const form = document.querySelector('form');
+      const messageDiv = document.getElementById('message');
+      const fields = ['nome', 'descricao', 'categoria', 'valor', 'adicional'];
+
+      // Guardar valores originais
+      const originalValues = {};
+      fields.forEach(field => {
+        const el = document.getElementById(field);
+        if (el) originalValues[field] = el.value;
+      });
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Verificar se houve alteração
+        let changed = false;
+        for (let field of fields) {
+          const el = document.getElementById(field);
+          if (el && el.value !== originalValues[field]) {
+            changed = true;
+            break;
+          }
+        }
+
+        // Verifica se imagem foi alterada (arquivo selecionado)
+        const imagemInput = document.getElementById('imagem');
+        if (imagemInput && imagemInput.files.length > 0) {
+          changed = true;
+        }
+
+        if (!changed) {
+          messageDiv.textContent = 'Nada foi modificado.';
+          messageDiv.className = 'message error';
+          messageDiv.style.display = 'block';
+
+          setTimeout(() => {
+            messageDiv.style.display = 'none';
+            messageDiv.textContent = '';
+          }, 3000);
+
+          return; // não envia
+        }
+
+        // Se mudou, enviar via ajax
+        const formData = new FormData(form);
+
+        try {
+          const response = await fetch(form.action || window.location.href, {
+            method: form.method || 'POST',
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: formData,
+          });
+
+          if (response.ok) {
+            messageDiv.textContent = 'Alterações salvas com sucesso! Redirecionando...';
+            messageDiv.className = 'message success';
+            messageDiv.style.display = 'block';
+
+            setTimeout(() => {
+              window.location.href = "{% url 'produto_list' %}";
+            }, 1500);
+
+            setTimeout(() => {
+              messageDiv.style.display = 'none';
+              messageDiv.textContent = '';
+            }, 3000);
+          } else {
+            messageDiv.textContent = 'Erro ao salvar as alterações.';
+            messageDiv.className = 'message error';
+            messageDiv.style.display = 'block';
+
+            setTimeout(() => {
+              messageDiv.style.display = 'none';
+              messageDiv.textContent = '';
+            }, 3000);
+          }
+        } catch (error) {
+          messageDiv.textContent = 'Erro na comunicação com o servidor.';
+          messageDiv.className = 'message error';
+          messageDiv.style.display = 'block';
+
+          setTimeout(() => {
+            messageDiv.style.display = 'none';
+            messageDiv.textContent = '';
+          }, 3000);
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>
+
+
+
+<!--<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Produto</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background-color: #ADD8E6;
+            margin: 0;
+            padding: 20px;
+            overflow: auto;
+        }
+
+        .header-bar {
+            background-color: #ADD8E6;
+            color: black;
+            text-align: center;
+            padding: 15px 20px;
+            font-size: 24px;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .header-bar .icon {
+            margin-right: 10px;
+            color: black;
+        }
+
+        .header-bar .back-button {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            font-size: 20px;
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .header-bar .back-button:hover {
+            color: #0056b3;
+        }
+
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 80px auto 0;
+        }
+
+        div {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .message {
+            color: green;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .error {
+            color: red;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.querySelector('form');
+            const originalValues = {
+                nome: document.getElementById('nome').value,
+                descricao: document.getElementById('descricao').value,
+                marca: document.getElementById('marca').value,
+                categoria: document.getElementById('categoria').value,
+                quantidade: document.getElementById('quantidade').value,
+                valor: document.getElementById('valor').value,
+                adicional: document.getElementById('adicional').value,
+                imagem: document.getElementById('imagem').files.length
+            };
+
+            form.addEventListener('submit', async function (event) {
+                event.preventDefault();  
+
+                if (!isFormChanged(originalValues)) {
+                    showMessage('error-message', 'Nenhuma alteração foi feita.');
+                    return;
+                }
+
+                const formData = new FormData(form);
+
+                try {
+                    const response = await fetch(form.action, {
+                        method: form.method,
+                        body: formData,
+                        headers: {
+                            'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+                        },
+                    });
+
+                    if (response.ok) {
+                        showMessage('success-message');
+                        setTimeout(function () {
+                            window.location.href = "{% url 'produto_list' %}";
+                        }, 1500);  
+                    } else {
+                        showMessage('error-message', 'Erro ao salvar as alterações.');
+                    }
+                } catch (error) {
+                    showMessage('error-message', 'Erro ao salvar as alterações.');
+                }
+            });
+
+            function isFormChanged(originalValues) {
+                const currentValues = {
+                    nome: document.getElementById('nome').value,
+                    descricao: document.getElementById('descricao').value,
+                    marca: document.getElementById('marca').value,
+                    categoria: document.getElementById('categoria').value,
+                    quantidade: document.getElementById('quantidade').value,
+                    valor: document.getElementById('valor').value,
+                    adicional: document.getElementById('adicional').value,
+                    imagem: document.getElementById('imagem').files.length
+                };
+
+                for (const key in originalValues) {
+                    if (originalValues[key] !== currentValues[key]) {
+                        return true; 
+                    }
+                }
+                return false;
+            }
+
+            function showMessage(elementId, message = '') {
+                const messageElement = document.getElementById(elementId);
+                if (message) {
+                    messageElement.textContent = message;
+                }
+                messageElement.style.display = 'block';
+                setTimeout(function () {
+                    messageElement.style.display = 'none';
+                }, 1500);
+            }
+        });
+    </script>
+</head>
+
+<body>
+    <div class="header-bar">
+        <a href="{% url 'produto_list' %}" class="back-button"> &#8592; </a>
+        <i class="fas fa-edit icon"></i> Editar Produto
+    </div>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div>
+            <label for="nome">Nome:</label>
+            <input type="text" id="nome" name="nome" value="{{ produto.nome }}" required>
+        </div>
+        <div>
+            <label for="descricao">Descrição:</label>
+            <textarea id="descricao" name="descricao" required>{{ produto.descricao }}</textarea>
+        </div>
+        <div>
+            <label for="marca">Marca:</label>
+            <input type="text" id="marca" name="marca" value="{{ produto.marca }}" required>
+        </div>
+        <div>
+            <label for="categoria">Categoria:</label>
+            <select id="categoria" name="categoria" required>
+                {% for categoria in categorias %}
+                <option value="{{ categoria.id }}" {% if categoria.id == produto.categoria.id %}selected{% endif %}>
+                    {{ categoria.nome }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label for="quantidade">Quantidade:</label>
+            <input type="number" id="quantidade" name="quantidade" value="{{ produto.quantidade }}" required>
+        </div>
+        <div>
+            <label for="valor">Valor:</label>
+            <input type="text" id="valor" name="valor" value="{{ produto.valor }}" required>
+        </div>
+        <div>
+            <label for="adicional">Adicional:</label>
+            <select id="adicional" name="adicional" required>
+                <option value="disponivel" {% if produto.adicional == "disponivel" %}selected{% endif %}>Disponível</option>
+                <option value="nao_disponivel" {% if produto.adicional == "nao_disponivel" %}selected{% endif %}>Não disponível</option>
+            </select>
+        </div>
+        <div>
+            <label for="imagem">Imagem:</label>
+            <input type="file" id="imagem" name="imagem">
+        </div>
+        <div>
+            <button type="submit">Salvar Alterações</button>
+        </div>
+        <div id="success-message" class="message">Alterações salvas com sucesso!</div>
+        <div id="error-message" class="error">Falha ao salvar as alterações.</div>
+    </form>
+</body>
+
+</html>
+-->

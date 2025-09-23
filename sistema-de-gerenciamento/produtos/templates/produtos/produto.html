@@ -1,0 +1,581 @@
+{% extends 'base.html' %}
+
+{% block title %}Gerenciamento de Produtos{% endblock %}
+
+{% block page_title %}
+    <i class="fas fa-briefcase"></i> Área do Empresário
+{% endblock %}
+
+{% block content %}
+{% if mostrar_mensagem %}
+  {% if messages %}
+    {% for message in messages %}
+      <p class="message {% if message.tags == 'error' %}error{% else %}success{% endif %}" style="text-align:center; font-weight:600; margin-bottom:1rem;">
+        {{ message }}
+      </p>
+    {% endfor %}
+  {% endif %}
+{% endif %}
+
+<div class="top-bar">
+    <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchProduct" placeholder="Pesquisar produto..." oninput="filterProducts()">
+    </div>
+    <div class="filter-group">
+        <label for="adicional-filter">Disponibilidade:</label>
+        <select id="adicional-filter" onchange="filterProducts()">
+            <option value="">Todos</option>
+            <option value="disponivel">Disponível</option>
+            <option value="nao_disponivel">Não Disponível</option>
+        </select>
+    </div>
+</div>
+
+<div id="noResultsMessage" class="empty-state" style="display: none;">
+    <i class="fas fa-search"></i>
+    <h3>Nenhum produto encontrado</h3>
+    <p>Tente ajustar os filtros de busca</p>
+</div>
+
+{% if produtos %}
+<div class="table-container" id="productTableContainer">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Produto</th>
+                <th>Categoria</th>
+                <th>Valor</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+       <tbody>
+    {% for produto in produtos %}
+        <tr class="product-row" data-adicional="{{ produto.adicional|lower }}">
+            <td data-label="Produto">{{ produto.nome }}</td>
+            <td data-label="Categoria">
+                {% if produto.categorias.exists %}
+                    {% for categoria in produto.categorias.all %}
+                        {{ categoria.nome }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                {% else %}
+                    <span class="no-category">Sem categoria</span>
+                {% endif %}
+            </td>
+            <td data-label="Valor">R$ {{ produto.valor }}</td>
+            <td data-label="Status">
+                {% if produto.adicional|lower == 'disponivel' %}
+                    <span class="status-badge status-available">Disponível</span>
+                {% elif produto.adicional|lower == 'nao_disponivel' %}
+                    <span class="status-badge status-unavailable">Não Disponível</span>
+                {% else %}
+                    <span class="status-badge">{{ produto.adicional }}</span>
+                {% endif %}
+            </td>
+            <td data-label="Ações">
+                <div class="actions">
+                    <a href="{% url 'produto_update' produto.id %}" class="action-btn edit-btn" title="Editar">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'produto_delete' produto.id %}" class="action-btn delete-btn" title="Excluir">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </div>
+            </td>
+        </tr>
+    {% endfor %}
+</tbody>
+    </table>
+</div>
+
+<div class="pagination">
+    {% if produtos.has_previous %}
+        <a href="?page={{ produtos.previous_page_number }}" class="pagination-arrow" title="Anterior">
+            <i class="fas fa-chevron-left"></i>
+        </a>
+    {% else %}
+        <span class="pagination-arrow disabled"><i class="fas fa-chevron-left"></i></span>
+    {% endif %}
+
+    <span class="current-page">Página {{ produtos.number }} de {{ produtos.paginator.num_pages }}</span>
+
+    {% if produtos.has_next %}
+        <a href="?page={{ produtos.next_page_number }}" class="pagination-arrow" title="Próxima">
+            <i class="fas fa-chevron-right"></i>
+        </a>
+    {% else %}
+        <span class="pagination-arrow disabled"><i class="fas fa-chevron-right"></i></span>
+    {% endif %}
+</div>
+{% else %}
+<div class="empty-state">
+    <i class="fas fa-box-open"></i>
+    <h3>Nenhum produto cadastrado</h3>
+</div>
+{% endif %}
+
+<style>
+    :root {
+        --cor-primaria: #fcd3d3;
+        --cor-secundaria: #c1e6d0;
+        --cor-destaque: #f87171;
+        --cor-verde-hover: #c1e6d0;
+    }
+
+    .top-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        align-items: center;
+    }
+
+    .search-box {
+        position: relative;
+        flex: 1 1 250px;
+        min-width: 200px;
+    }
+
+    .search-box i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        pointer-events: none;
+    }
+
+    .search-box input {
+        width: 100%;
+        padding: 10px 12px 10px 36px;
+        border-radius: 10px;
+        border: 1px solid #cbd5e1;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+        outline-offset: 2px;
+    }
+
+    .search-box input:focus {
+        border-color: var(--cor-verde-hover);
+        box-shadow: 0 0 6px var(--cor-verde-hover);
+    }
+
+    .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .filter-group label {
+        font-weight: 600;
+        color: #374151;
+        white-space: nowrap;
+    }
+
+    .filter-group select {
+        padding: 8px 12px;
+        border-radius: 10px;
+        border: 1px solid #cbd5e1;
+        font-size: 1rem;
+        background-color: white;
+        cursor: pointer;
+        transition: border-color 0.3s ease;
+        outline-offset: 2px;
+        min-width: 150px;
+    }
+
+    .filter-group select:hover, .filter-group select:focus {
+        border-color: var(--cor-verde-hover);
+        box-shadow: 0 0 6px var(--cor-verde-hover);
+    }
+
+    .table-container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        margin-top: 1rem;
+        overflow-x: auto;
+        padding: 0 15px;
+        box-sizing: border-box;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 12px;
+        table-layout: fixed;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #374151;
+        background: transparent;
+        box-sizing: border-box;
+    }
+
+    .data-table thead tr {
+        background-color: var(--cor-primaria);
+        color: #6b4226;
+    }
+
+    .data-table thead th {
+        padding: 1rem 0.75rem;
+        text-align: left;
+        font-weight: 700;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .data-table thead th:nth-child(1) { width: 35%; }
+    .data-table thead th:nth-child(2) { width: 25%; }
+    .data-table thead th:nth-child(3) { width: 15%; }
+    .data-table thead th:nth-child(4) { width: 15%; }
+    .data-table thead th:nth-child(5) { width: 10%; }
+
+    .data-table tbody tr {
+        background: white;
+        box-shadow: 0 4px 8px rgb(0 0 0 / 0.05);
+        border-radius: 15px;
+        transition: background 0.3s ease, box-shadow 0.3s ease;
+        cursor: pointer;
+    }
+
+    .data-table tbody tr:hover {
+        background: var(--cor-secundaria);
+        box-shadow: 0 6px 15px rgb(28 113 73 / 0.3);
+    }
+
+    .data-table tbody td {
+        padding: 1rem 0.75rem;
+        text-align: left;
+        vertical-align: middle;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .status-badge {
+        padding: 0.3rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        user-select: none;
+    }
+
+    .status-available {
+        background-color: #dcfce7;
+        color: #166534;
+    }
+
+    .status-unavailable {
+        background-color: #fee2e2;
+        color: #b91c1c;
+    }
+
+    .actions {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+    }
+
+    .action-btn {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-decoration: none;
+        transition: background-color 0.2s ease, transform 0.1s ease;
+    }
+
+    .edit-btn {
+        background-color: var(--cor-secundaria);
+        color: #14532d;
+    }
+
+    .edit-btn:hover {
+        background-color: #22c55e;
+        color: white;
+        transform: scale(1.1);
+    }
+
+    .delete-btn {
+        background-color: #ef4444;
+    }
+
+    .delete-btn:hover {
+        background-color: #dc2626;
+        transform: scale(1.05);
+    }
+
+    .empty-state {
+        text-align: center;
+        color: #6b7280;
+        margin-top: 3rem;
+    }
+
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 0.5rem;
+        color: #9ca3af;
+    }
+
+    .pagination {
+        margin-top: 1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        color: #374151;
+        font-weight: 600;
+        user-select: none;
+        flex-wrap: wrap;
+    }
+
+    .pagination-arrow {
+        color: var(--cor-secundaria);
+        cursor: pointer;
+        font-size: 1.25rem;
+        transition: color 0.3s ease;
+        text-decoration: none;
+        padding: 0.5rem;
+    }
+
+    .pagination-arrow:hover {
+        color: #22c55e;
+    }
+
+    .pagination-arrow.disabled {
+        cursor: default;
+        color: #cbd5e1;
+    }
+
+    .current-page {
+        font-size: 0.9rem;
+        text-align: center;
+    }
+
+    /* Responsividade para tablets */
+    @media (max-width: 1024px) {
+        .table-container {
+            padding: 0 10px;
+        }
+        
+        .data-table thead th:nth-child(1) { width: 30%; }
+        .data-table thead th:nth-child(2) { width: 20%; }
+        .data-table thead th:nth-child(3) { width: 15%; }
+        .data-table thead th:nth-child(4) { width: 20%; }
+        .data-table thead th:nth-child(5) { width: 15%; }
+    }
+
+    /* Responsividade para telas médias */
+    @media (max-width: 768px) {
+        .top-bar {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.75rem;
+        }
+
+        .search-box {
+            flex: 1 1 100%;
+        }
+
+        .filter-group {
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .filter-group select {
+            flex: 1;
+            min-width: auto;
+        }
+
+        .table-container {
+            padding: 0 5px;
+            overflow-x: auto;
+        }
+
+        .data-table {
+            min-width: 600px;
+        }
+
+        .pagination {
+            gap: 0.5rem;
+        }
+
+        .current-page {
+            font-size: 0.8rem;
+        }
+    }
+
+    /* Responsividade para dispositivos móveis */
+    @media (max-width: 600px) {
+        .data-table,
+        .data-table thead,
+        .data-table tbody,
+        .data-table th,
+        .data-table td,
+        .data-table tr {
+            display: block;
+        }
+
+        .data-table {
+            min-width: auto;
+            border-spacing: 0;
+        }
+
+        .data-table thead tr {
+            position: absolute;
+            top: -9999px;
+            left: -9999px;
+        }
+
+        .data-table tbody tr {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: block;
+        }
+
+        .data-table tbody tr:hover {
+            background: var(--cor-secundaria);
+            transform: translateY(-2px);
+        }
+
+        .data-table td {
+            border: none;
+            position: relative;
+            padding: 0.75rem 0;
+            text-align: left;
+            white-space: normal;
+            word-wrap: break-word;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .data-table td:last-child {
+            border-bottom: none;
+        }
+
+        .data-table td:before {
+            content: attr(data-label) ": ";
+            font-weight: 600;
+            color: #374151;
+            flex-shrink: 0;
+            margin-right: 1rem;
+        }
+
+        .data-table td .status-badge {
+            margin-left: auto;
+        }
+
+        .data-table td .actions {
+            margin-left: auto;
+            gap: 0.75rem;
+        }
+
+        .action-btn {
+            width: 40px;
+            height: 40px;
+        }
+
+        .table-container {
+            padding: 0;
+        }
+
+        .pagination {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .pagination .current-page {
+            order: -1;
+            font-size: 1rem;
+        }
+
+        .pagination-arrow {
+            font-size: 1.5rem;
+            padding: 1rem;
+        }
+    }
+
+    /* Responsividade para telas muito pequenas */
+    @media (max-width: 480px) {
+        .data-table td {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .data-table td:before {
+            margin-right: 0;
+            margin-bottom: 0.25rem;
+        }
+
+        .data-table td .status-badge,
+        .data-table td .actions {
+            margin-left: 0;
+            align-self: flex-end;
+        }
+
+        .action-btn {
+            width: 36px;
+            height: 36px;
+        }
+
+        .empty-state {
+            padding: 1rem;
+        }
+
+        .empty-state i {
+            font-size: 2rem;
+        }
+
+        .empty-state h3 {
+            font-size: 1.25rem;
+        }
+    }
+</style>
+
+<script>
+    function filterProducts() {
+        const searchTerm = document.getElementById("searchProduct").value.toLowerCase();
+        const availability = document.getElementById("adicional-filter").value;
+        const products = document.querySelectorAll(".product-row");
+        let found = false;
+
+        products.forEach(product => {
+            const productName = product.querySelector("td").textContent.toLowerCase();
+            const productAvailability = product.getAttribute("data-adicional").toLowerCase();
+
+            const matchesSearch = productName.includes(searchTerm);
+            const matchesAvailability = availability ? productAvailability === availability : true;
+
+            if (matchesSearch && matchesAvailability) {
+                product.style.display = "";
+                found = true;
+            } else {
+                product.style.display = "none";
+            }
+        });
+
+        const noResultsMessage = document.getElementById("noResultsMessage");
+        const tableContainer = document.getElementById("productTableContainer");
+
+        if (!found && (searchTerm || availability)) {
+            noResultsMessage.style.display = "block";
+            if (tableContainer) tableContainer.style.display = "none";
+        } else {
+            noResultsMessage.style.display = "none";
+            if (tableContainer) tableContainer.style.display = "block";
+        }
+    }
+</script>
+{% endblock %}

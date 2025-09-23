@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo de Produtos</title>
+    <!-- Link para o Google Fonts (Fonte Roboto) -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap">
+    <!-- Link para o Font Awesome (para ícones) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background-color: #ADD8E6;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Barra de título fixa no topo */
+        .header-bar {
+            background-color: #ADD8E6; /* Cor de fundo mais clara */
+            color: black; /* Cor preta para o texto */
+            text-align: center;
+            padding: 15px 0;
+            font-size: 24px;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000; /* Garante que a barra fique sobre os outros elementos */
+        }
+
+        .header-bar .icon {
+            margin-right: 10px; /* Espaçamento entre o ícone e o texto */
+            color: black; /* Cor preta para o ícone */
+        }
+
+        .back-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #007BFF;
+            color: white;
+            padding: 10px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 1000;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+        }
+
+        .back-button:hover {
+            background-color: #0056b3;
+        }
+
+        .arrow-button {
+            font-size: 18px;
+            display: block;
+            transform: rotate(90deg);
+        }
+
+        .product-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
+            margin-top: 100px; /* Espaço para os cards não sobreporem a barra */
+        }
+
+        .product-item {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            width: 150px;
+            margin: 5px;
+            text-align: justify;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 12px;
+        }
+
+        .product-image {
+            max-width: 100%;
+            height: auto;
+            max-height: 100px;
+            border-radius: 5px;
+            margin-bottom: 2px;
+        }
+
+        .no-results {
+            color: red;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .icons {
+            display: flex;
+            justify-content: center;
+            gap: 2px;
+            margin-top: 2px;
+        }
+
+        .icons a {
+            text-decoration: none;
+            color: #fff;
+            background: #007BFF;
+            padding: 2px 4px;
+            border-radius: 5px;
+            font-size: 11px;
+            transition: background 0.3s ease;
+        }
+
+        .icons a:hover {
+            background: #0056b3;
+        }
+
+        p {
+            margin: 2px 0;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-bar">
+        <!-- Ícone de lupa -->
+        <i class="fas fa-search icon"></i>
+        Catálogo de Produtos
+    </div>
+    <a href="{% url 'produto_list' %}" class="back-button">
+        <span class="arrow-button">&#8594;</span>
+    </a>
+
+    {% if resultados %}
+    <div class="product-container">
+        {% for produto in resultados %}
+        <div class="product-item">
+            {% if produto.imagem %}
+            <img src="{{ produto.imagem.url }}" alt="{{ produto.nome }}" class="product-image">
+            {% endif %}
+            <p>Produto: {{ produto.nome }}</p>
+            <p>Marca: {{ produto.marca }}</p>
+            <p>Descrição: {{ produto.descricao }}</p>
+            <p>Categoria: {{ produto.categoria }}</p>
+            <p>Quantidade: {{ produto.quantidade }}</p>
+            <p>Valor: R$ {{ produto.valor }}</p>
+            <div class="icons">
+                <a href="{% url 'produto_update' produto.id %}" title="Editar">✏️</a>
+                <a href="{% url 'produto_delete' produto.id %}" title="Excluir">🗑️</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="no-results">Nenhum produto encontrado</p>
+    {% endif %}
+</body>
+</html>

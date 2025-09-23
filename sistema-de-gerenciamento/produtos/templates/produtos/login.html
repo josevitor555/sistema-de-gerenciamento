@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login – Meu Negócio</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <style>
+    :root {
+      --cor-primaria: #fcd3d3;
+      --cor-secundaria: #c1e6d0;
+      --cor-destaque: #f87171;
+      --cor-texto: #1a202c;
+      --cor-fundo: #fefefe;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, var(--cor-primaria), var(--cor-secundaria));
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .wrapper {
+      display: flex;
+      width: 100%;
+      max-width: 1000px;
+      background-color: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+      flex-direction: column;
+    }
+
+    .image-side {
+      width: 100%;
+      max-height: 300px;
+      background-color: #f0f0f0;
+    }
+
+    .image-side img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .container {
+      padding: 2.5rem;
+      background-color: var(--cor-fundo);
+    }
+
+    .logo-section {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .logo {
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--cor-destaque);
+    }
+
+    .logo i {
+      margin-right: 0.5rem;
+    }
+
+    .subtitle {
+      color: #6b7280;
+      font-size: 0.95rem;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      color: var(--cor-texto);
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      margin-bottom: 0.5rem;
+      color: var(--cor-texto);
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    input {
+      padding: 0.875rem 1rem;
+      margin-bottom: 1.25rem;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--cor-destaque);
+      box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.2);
+    }
+
+    button {
+      padding: 0.875rem;
+      background-color: var(--cor-destaque);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #ef4444;
+    }
+
+    p {
+      text-align: center;
+      font-size: 0.9rem;
+      margin-top: 1rem;
+      color: #6b7280;
+    }
+
+    a {
+      color: var(--cor-destaque);
+      font-weight: 500;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .form-container {
+      display: none;
+    }
+
+    .form-container.active {
+      display: block;
+    }
+
+    .message {
+      background: #fef2f2;
+      color: #dc2626;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+      border: 1px solid #fecaca;
+      text-align: center;
+    }
+
+    .message.success {
+      background: #dcfce7;
+      color: #166534;
+      border: 1px solid #bbf7d0;
+    }
+
+    @media (min-width: 768px) {
+      .wrapper {
+        flex-direction: row;
+      }
+
+      .image-side {
+        flex: 1;
+        max-height: none;
+      }
+
+      .container {
+        flex: 1;
+      }
+    }
+  </style>
+
+  <script>
+    function toggleForm(formId) {
+      document.querySelectorAll('.form-container').forEach(form => {
+        form.classList.remove('active');
+      });
+      document.getElementById(formId).classList.add('active');
+    }
+
+    window.addEventListener("load", function () {
+      {% if is_register %}
+        toggleForm('registerForm');
+      {% else %}
+        toggleForm('loginForm');
+      {% endif %}
+
+      const msg = document.querySelector(".message");
+      if (msg) {
+        setTimeout(() => {
+          msg.style.display = "none";
+        }, 5000);
+      }
+    });
+  </script>
+</head>
+<body>
+  <div class="wrapper">
+    <div class="image-side">
+      <img src="https://images.unsplash.com/photo-1508780709619-79562169bc64?fit=crop&w=1000&q=80" alt="Imagem decorativa" />
+    </div>
+
+    <div class="container">
+      <div class="logo-section">
+        <div class="logo">
+          <i class="fas fa-store"></i> Meu Negócio
+        </div>
+        <p class="subtitle">Sistema de Gerenciamento</p>
+      </div>
+
+      <!-- Login -->
+      <div id="loginForm" class="form-container {% if not is_register %}active{% endif %}">
+        <h2>Login</h2>
+
+        {% if messages and not is_register %}
+          {% for message in messages %}
+            {% if forloop.first %}
+              <div class="message{% if message.tags == 'success' %} success{% endif %}">
+                {{ message }}
+              </div>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+
+        <form method="POST">
+          {% csrf_token %}
+          <label for="email">Email</label>
+          <input type="email" name="email" value="{{ request.POST.email }}" required />
+          <label for="password">Senha</label>
+          <input type="password" name="password" required />
+          <button type="submit" name="login">Entrar</button>
+        </form>
+        <p><a onclick="toggleForm('passwordResetForm')">Esqueceu a senha?</a></p>
+        <p>Não tem uma conta? <a onclick="toggleForm('registerForm')">Cadastre-se</a></p>
+      </div>
+
+      <!-- Recuperar Senha -->
+      <div id="passwordResetForm" class="form-container">
+        <h2>Redefinição de Senha</h2>
+        <form method="POST" action="{% url 'password_reset' %}">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit">Enviar</button>
+        </form>
+        <p>Voltar para <a onclick="toggleForm('loginForm')">Login</a></p>
+      </div>
+
+      <!-- Cadastro -->
+      <div id="registerForm" class="form-container {% if is_register %}active{% endif %}">
+        <h2>Cadastro</h2>
+
+        {% if messages and is_register %}
+          {% for message in messages %}
+            {% if forloop.first %}
+              <div class="message{% if message.tags == 'success' %} success{% endif %}">
+                {{ message }}
+              </div>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+
+        <form method="POST" action="{% url 'register' %}">
+          {% csrf_token %}
+          <label for="nome">Nome</label>
+          <input type="text" name="nome" required />
+          <label for="email">Email</label>
+          <input type="email" name="email" required />
+          <label for="password">Senha</label>
+          <input type="password" name="password" required />
+          <label for="password_confirm">Confirmar Senha</label>
+          <input type="password" name="password_confirm" required />
+          <button type="submit" name="register">Registrar</button>
+        </form>
+        <p>Já tem uma conta? <a onclick="toggleForm('loginForm')">Fazer login</a></p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Categoria</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #3a7bd5, #00d2ff);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        .header-bar {
+            background-color: rgba(255, 255, 255, 0.95);
+            color: #2d3748;
+            text-align: center;
+            padding: 20px;
+            font-size: 24px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0 0 16px 16px;
+            margin-bottom: 30px;
+        }
+        .header-bar .icon {
+            margin-right: 10px;
+            color: #3a7bd5;
+        }
+        .header-bar .back-button {
+            position: absolute;
+            left: 20px;
+            font-size: 20px;
+            color: #3a7bd5;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        .header-bar .back-button:hover {
+            background-color: rgba(58, 123, 213, 0.1);
+            transform: translateX(-3px);
+        }
+        form {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: 0 auto 30px;
+            width: 90%;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        .required::after {
+            content: " *";
+            color: #E53E3E;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #3a7bd5;
+            box-shadow: 0 0 0 3px rgba(58, 123, 213, 0.1);
+        }
+        button {
+            background: linear-gradient(90deg, #3a7bd5, #00d2ff);
+            color: white;
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(58, 123, 213, 0.3);
+        }
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-weight: 500;
+            display: none;
+        }
+        .success-message {
+            background: rgba(72, 187, 120, 0.1);
+            color: #2F855A;
+            border: 1px solid rgba(72, 187, 120, 0.2);
+        }
+        .error-message {
+            background: rgba(229, 62, 62, 0.1);
+            color: #C53030;
+            border: 1px solid rgba(229, 62, 62, 0.2);
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const originalValues = {
+                nome: document.getElementById('nome').value,
+                descricao: document.getElementById('descricao').value
+            };
+
+            if (form) {
+                form.addEventListener('submit', async function(event) {
+                    event.preventDefault();
+
+                    if (!validateForm()) {
+                        return; // Impede o envio se o formulário estiver incompleto
+                    }
+
+                    // Verifica se houve alterações
+                    if (!isFormChanged(originalValues)) {
+                        showMessage('error-message', 'Nenhuma alteração foi feita.');
+                        return; // Impede o envio do formulário
+                    }
+
+                    const formData = new FormData(form);
+                    try {
+                        const response = await fetch(form.action, {
+                            method: form.method,
+                            body: formData,
+                            headers: {
+                                'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+                            },
+                        });
+
+                        if (response.ok) {
+                            showMessage('success-message');
+                            setTimeout(function() {
+                                window.location.href = "{% url 'categoria_list' %}";
+                            }, 1500);
+                        } else {
+                            showMessage('error-message');
+                        }
+                    } catch (error) {
+                        showMessage('error-message');
+                    }
+                });
+            }
+
+            function validateForm() {
+                const nomeInput = document.getElementById('nome');
+                if (!nomeInput.value.trim()) {
+                    nomeInput.style.borderColor = '#E53E3E';
+                    showMessage('error-message', 'O nome da categoria é obrigatório!');
+                    return false;
+                }
+                nomeInput.style.borderColor = '#e2e8f0';
+                return true;
+            }
+
+            function isFormChanged(originalValues) {
+                const currentValues = {
+                    nome: document.getElementById('nome').value,
+                    descricao: document.getElementById('descricao').value
+                };
+
+                for (const key in originalValues) {
+                    if (originalValues[key] !== currentValues[key]) {
+                        return true; // Se houver diferença, significa que algo foi alterado
+                    }
+                }
+                return false; // Se não houver diferença, significa que nada foi alterado
+            }
+
+            function showMessage(elementId, customMessage = null) {
+                const messageElement = document.getElementById(elementId);
+                if (messageElement) {
+                    if (customMessage) {
+                        messageElement.textContent = customMessage;
+                    }
+                    messageElement.style.display = 'block';
+                    setTimeout(function() {
+                        messageElement.style.display = 'none';
+                    }, 3000);
+                }
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="header-bar">
+        <a href="{% url 'categoria_list' %}" class="back-button">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <i class="fas fa-edit icon"></i>
+        Editar Categoria
+    </div>
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="nome" class="required">Nome da Categoria</label>
+            <input type="text" id="nome" name="nome" value="{{ categoria.nome }}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="descricao">Descrição</label>
+            <input type="text" id="descricao" name="descricao" value="{{ categoria.descricao|default:'' }}">
+        </div>
+
+        <button type="submit">
+            <i class="fas fa-save"></i> Salvar Alterações
+        </button>
+        
+        <div id="success-message" class="message success-message">Categoria atualizada com sucesso!</div>
+        <div id="error-message" class="message error-message">Falha ao atualizar a categoria.</div>
+    </form>
+</body>
+</html>

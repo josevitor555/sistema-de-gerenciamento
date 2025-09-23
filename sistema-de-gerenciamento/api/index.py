@@ -1,0 +1,1 @@
+from gerenciamento_de_produto.wsgi import application as app

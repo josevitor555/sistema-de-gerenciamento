@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nova Categoria - Admin Pro</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+    <style>
+        :root {
+            --cor-primaria: #fcd3d3;
+            --cor-secundaria: #c1e6d0;
+            --cor-destaque: #f87171;
+            --cor-texto: #1a202c;
+            --cor-fundo: #fefefe;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--cor-secundaria);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .form-container {
+            max-width: 600px;
+            background: var(--cor-fundo);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .form-container:hover {
+            transform: scale(1.02);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid var(--cor-primaria);
+        }
+
+        .btn-primary {
+            background: var(--cor-destaque);
+            color: white;
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background: #e84343;
+            transform: translateY(-2px);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.8rem;
+            border-radius: 10px;
+            border: 2px solid var(--cor-primaria);
+            font-size: 1rem;
+            transition: border 0.3s ease-in-out;
+        }
+
+        .form-input:focus {
+            border-color: var(--cor-destaque);
+            outline: none;
+        }
+
+        .message {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            font-weight: 500;
+            display: none;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .message.success {
+            background: var(--cor-secundaria);
+            color: #2f855a;
+            border: 1px solid var(--cor-texto);
+        }
+
+        .message.error {
+            background: var(--cor-primaria);
+            color: var(--cor-destaque);
+            border: 1px solid var(--cor-texto);
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="header">
+            <a href="{% url 'produto_list' %}" class="back-btn"><i class="fas fa-arrow-left"></i></a>
+            <div class="header-title"><h1>Nova Categoria</h1><p>Cadastre uma nova categoria</p></div>
+        </div>
+
+        <div id="success-message" class="message success"><i class="fas fa-check-circle"></i> Categoria cadastrada com sucesso!</div>
+        <div id="error-message" class="message error"><i class="fas fa-exclamation-circle"></i> Erro ao cadastrar categoria.</div>
+
+        <form method="POST" id="categoryForm">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="nome" class="form-label required">Nome da Categoria</label>
+                <input type="text" id="nome" name="nome" class="form-input" placeholder="Digite o nome da categoria" required />
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Cadastrar Categoria</button>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('categoryForm');
+
+            form.addEventListener('submit', async function (event) {
+                event.preventDefault();
+                const formData = new FormData(form);
+
+                try {
+                    const response = await fetch(form.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: { 'X-CSRFToken': formData.get('csrfmiddlewaretoken') }
+                    });
+
+                    if (response.ok) {
+                        showMessage('success-message');
+                        form.reset();
+                    } else {
+                        showMessage('error-message');
+                    }
+                } catch (error) {
+                    showMessage('error-message');
+                }
+            });
+
+            function showMessage(elementId) {
+                const messageElement = document.getElementById(elementId);
+                messageElement.style.display = 'flex';
+                messageElement.style.opacity = '1';
+                setTimeout(() => { messageElement.style.opacity = '0'; }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>

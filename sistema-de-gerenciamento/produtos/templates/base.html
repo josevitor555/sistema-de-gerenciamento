@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Meu Site{% endblock %}</title>
+
+    {% load static %}
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --cor-primaria: #fcd3d3;
+            --cor-secundaria: #c1e6d0;
+            --cor-destaque: #f87171;
+            --cor-texto: #1a202c;
+            --cor-sidebar: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            overflow-x: hidden;
+            height: 100%;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #fefefe;
+            color: var(--cor-texto);
+            height: 100vh;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+            width: 100%;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--cor-sidebar);
+            color: var(--cor-texto);
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border-right: 2px solid #e2e8f0;
+            overflow-y: auto; /* barra aparece só se precisar */
+            padding-bottom: 1rem;
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem 1rem 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            flex-shrink: 0;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--cor-destaque);
+        }
+
+        .bem-vindo {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 1.5rem;
+            flex-grow: 1;
+            overflow-y: auto; /* barra aparece só se precisar */
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--cor-texto);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            background: var(--cor-secundaria);
+            color: var(--cor-texto);
+        }
+
+        .sidebar-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #e2e8f0;
+            flex-shrink: 0;
+        }
+
+        .logout-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            background: var(--cor-primaria);
+            border: none;
+            color: var(--cor-texto);
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            width: 100%;
+            justify-content: center;
+            transition: background 0.3s;
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background: var(--cor-destaque);
+            color: white;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--cor-destaque);
+            margin-bottom: 1rem;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .categoria-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f9fafb;
+            padding: 0.5rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+        }
+
+        .btn-excluir {
+            background: transparent;
+            border: none;
+            color: var(--cor-destaque);
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .btn-excluir:hover {
+            color: #dc2626;
+        }
+
+        .product-image {
+            max-width: 100px;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-info {
+            margin-bottom: 1rem;
+        }
+
+        .no-products {
+            color: gray;
+        }
+
+        /* Container categorias */
+        #categoriasContainer {
+            display: none;
+            padding-left: 1rem;
+            margin-top: 1rem;
+            max-height: 200px;
+            overflow-y: auto; /* barra aparece só se precisar */
+        }
+
+        /* Barras de rolagem invisíveis mas scroll funcional */
+        /* Chrome, Edge, Safari */
+        .sidebar::-webkit-scrollbar,
+        .sidebar-nav::-webkit-scrollbar,
+        #categoriasContainer::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+            background: transparent;
+        }
+
+        /* Firefox */
+        .sidebar,
+        .sidebar-nav,
+        #categoriasContainer {
+            scrollbar-width: none;
+        }
+
+        /* Ajustes responsivos para sidebar menor, sem esconder */
+        @media (max-width: 480px) {
+            .sidebar {
+                width: 200px;
+                padding-bottom: 0.5rem;
+            }
+            .main-content {
+                margin-left: 200px;
+                padding: 1rem;
+            }
+
+            .sidebar-header {
+                padding: 1.5rem 1rem 1rem 1rem;
+            }
+
+            .sidebar-nav {
+                padding: 0.75rem 1rem;
+            }
+
+            .nav-link {
+                padding: 0.6rem 0.8rem;
+                font-size: 0.9rem;
+            }
+
+            .page-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="sidebar" id="sidebar">
+        <div>
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-store"></i> Área do Empresário
+                </div>
+                {% if user.is_authenticated %}
+                <div class="bem-vindo">
+                    Bem-vindo, <strong>{{ user.nome|default:user.email }}</strong> 👋
+                </div>
+                {% endif %}
+            </div>
+            <div class="sidebar-nav">
+                <a href="{% url 'produto_create' %}" class="nav-link">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Novo Produto</span>
+                </a>
+
+                <!-- Link categorias -->
+                <a href="#" class="nav-link" id="categoriasLink" aria-expanded="false" aria-controls="categoriasContainer">
+                    <i class="fas fa-tags"></i>
+                    <span>Categorias</span>
+                </a>
+
+                <!-- Container que engloba a lista -->
+                <div id="categoriasContainer">
+                    {% if categorias %}
+                        {% for categoria in categorias %}
+                            <div class="categoria-item" data-id="{{ categoria.id }}">
+                                <span class="categoria-nome">{{ categoria.nome }}</span>
+                                <button class="btn-excluir" onclick="excluirCategoria({{ categoria.id }})" title="Excluir">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p style="color: gray;">Nenhuma categoria cadastrada.</p>
+                    {% endif %}
+                </div>
+
+                <!-- Botão nova categoria fora da lista, mas dentro do bloco categorias -->
+                <a href="{% url 'categoria_create' %}" id="btnNovaCategoria" class="nav-link" style="display:none; color: var(--cor-destaque); margin-left: 1rem; margin-top: 0.5rem;">
+                    + Nova Categoria
+                </a>
+            </div>
+        </div>
+        <div class="sidebar-footer">
+            <a href="{% url 'logout' %}" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Sair</span>
+            </a>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <h1 class="page-title">{% block page_title %}Gerenciamento de Produtos{% endblock %}</h1>
+        <div class="content-card">
+            {% block content %}
+            {% if produtos %}
+                <ul>
+                    {% for produto in produtos %}
+                        <li>
+                            {% if produto.imagem %}
+                                <img src="{{ produto.imagem.url }}" alt="{{ produto.nome }}" class="product-image"><br>
+                            {% endif %}
+                            <div class="product-info">
+                                <p>Produto: {{ produto.nome }}</p>
+                                <p>Marca: {{ produto.marca }}</p>
+                                <p>Descrição: {{ produto.descricao }}</p>
+                                <p>Categoria: {{ produto.categoria }}</p>
+                                <p>Quantidade: {{ produto.quantidade }}</p>
+                                <p>Valor: R$ {{ produto.valor }}</p>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="no-products">Nenhum produto cadastrado.</p>
+            {% endif %}
+            {% endblock %}
+        </div>
+    </main>
+</div>
+
+<script>
+    const categoriasLink = document.getElementById("categoriasLink");
+    const categoriasContainer = document.getElementById("categoriasContainer");
+    const btnNovaCategoria = document.getElementById("btnNovaCategoria");
+
+    categoriasLink.addEventListener("click", function (e) {
+        e.preventDefault();
+        const isVisible = categoriasContainer.style.display === "block";
+        if (isVisible) {
+            categoriasContainer.style.display = "none";
+            btnNovaCategoria.style.display = "none";
+            categoriasLink.setAttribute('aria-expanded', 'false');
+        } else {
+            categoriasContainer.style.display = "block";
+            btnNovaCategoria.style.display = "block";
+            categoriasLink.setAttribute('aria-expanded', 'true');
+        }
+    });
+
+    function excluirCategoria(id) {
+        if (!confirm("Tem certeza que deseja excluir esta categoria?")) return;
+
+        fetch(`/categorias/${id}/excluir/`, {
+            method: "DELETE",
+            headers: {
+                "X-CSRFToken": "{{ csrf_token }}",
+                "Content-Type": "application/json",
+            }
+        })
+        .then(res => {
+            if (res.ok) {
+                document.querySelector(`.categoria-item[data-id="${id}"]`).remove();
+            } else {
+                alert("Erro ao excluir a categoria.");
+            }
+        })
+        .catch(error => {
+            console.error("Erro:", error);
+            alert("Erro na conexão com o servidor.");
+        });
+    }
+</script>
+</body>
+</html>
