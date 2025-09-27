@@ -9,3 +9,9 @@ Em parceiria com a Franciane (Desenvolvedora backend da aplicação em Django)
 
 #### Imagem do Backend (Django):
 <img width="959" height="455" alt="Captura de tela 2025-09-24 093106" src="https://github.com/user-attachments/assets/90137604-716b-47f7-bd58-71e59cc8c864" />
+<<<<<<< HEAD
+=======
+
+### Observação
+O projeto ainda estar em fase de desenvolvimento.
+>>>>>>> c0eb5d1e8c7b8a515aba980987693c621d3b2e18
