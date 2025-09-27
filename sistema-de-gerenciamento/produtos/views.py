@@ -17,6 +17,33 @@ from django.http import JsonResponse
 import logging
 logger = logging.getLogger(__name__)
 
+from rest_framework import generics
+from rest_framework import filters
+from .models import Categoria, Produto
+from .serializers import CategoriaSerializer, ProdutoSerializer
+
+class CategoriaListAPIView(generics.ListAPIView):
+    queryset = Categoria.objects.all()
+    serializer_class = CategoriaSerializer
+
+class ProdutoListAPIView(generics.ListAPIView):
+    queryset = Produto.objects.all()
+    serializer_class = ProdutoSerializer
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['nome', 'descricao', 'marca']
+    ordering_fields = ['nome', 'valor', 'updated_at']
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        categori_id = self.request.query_params.get('categoria')
+        if categori_id:
+            try:
+                categori_id = int(categori_id)
+                queryset = queryset.filter(categorias__id=categori_id)
+            except ValueError:
+                # Lida com o caso em que o ID da categoria não é um número válido
+                pass
+        return queryset
 
 
 def register_view(request):

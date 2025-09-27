@@ -8,6 +8,10 @@ pymysql.install_as_MySQLdb()
 import os
 os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 
+# Adicione estas duas linhas para carregar as variáveis do .env
+from dotenv import load_dotenv
+load_dotenv()
+
 
 
 
@@ -53,14 +57,21 @@ INSTALLED_APPS = [
     'cloudinary',  # novo
     'cloudinary_storage',  # novo
 
+    'corsheaders',
+    'rest_framework'
+
 ]
 SITE_ID = 1
+
+# CORS Requests from frontend (localhost)
+CORS_ALLOWED_ORIGINS = ["http://localhost:5173"]
 
 # settings.py
 AUTH_USER_MODEL = 'produtos.Usuario'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',

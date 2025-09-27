@@ -27,8 +27,8 @@ export function CartItem({ item }: CartItemProps) {
             {/* Product Image */}
             <div className="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
                 <img
-                    src={item.product.image}
-                    alt={item.product.title}
+                    src={item.product.imagem}
+                    alt={item.product.nome}
                     className="w-full h-full object-cover"
                 />
             </div>
@@ -36,10 +36,10 @@ export function CartItem({ item }: CartItemProps) {
             {/* Product Details */}
             <div className="flex-1 min-w-0">
                 <h4 className="font-medium text-gray-900 truncate">
-                    {item.product.title}
+                    {item.product.nome}
                 </h4>
                 <p className="text-lg font-semibold text-gray-900 mt-1">
-                    R$ {item.product.price.toFixed(2)}
+                    R$ {item.product.valor.toFixed(2)}
                 </p>
             </div>
 
@@ -49,8 +49,8 @@ export function CartItem({ item }: CartItemProps) {
                     size="sm"
                     variant="outline"
                     onClick={handleDecrement}
-                    className="h-8 w-8 p-0 rounded-full border-orange-300 text-orange-600 hover:bg-orange-50"
-                    aria-label={`Diminuir quantidade de ${item.product.title}`}
+                    className="h-8 w-8 p-0 rounded-full border-[#70bf2b] text-[#70bf2b] hover:bg-orange-50"
+                    aria-label={`Diminuir quantidade de ${item.product.nome}`}
                 >
                     <Minus className="h-4 w-4" />
                 </Button>
@@ -63,8 +63,8 @@ export function CartItem({ item }: CartItemProps) {
                     size="sm"
                     variant="outline"
                     onClick={handleIncrement}
-                    className="h-8 w-8 p-0 rounded-full border-orange-300 text-orange-600 hover:bg-orange-50"
-                    aria-label={`Aumentar quantidade de ${item.product.title}`}
+                    className="h-8 w-8 p-0 rounded-full border-[#70bf2b] text-[#70bf2b] hover:bg-orange-50"
+                    aria-label={`Aumentar quantidade de ${item.product.nome}`}
                 >
                     <Plus className="h-4 w-4" />
                 </Button>
@@ -75,8 +75,8 @@ export function CartItem({ item }: CartItemProps) {
                 size="sm"
                 variant="ghost"
                 onClick={handleRemove}
-                className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
-                aria-label={`Remover ${item.product.title} do carrinho`}
+                className="h-8 w-8 p-0 text-[#70bf2b] hover:bg-red-50"
+                aria-label={`Remover ${item.product.nome} do carrinho`}
             >
                 <Trash2 className="h-4 w-4" />
             </Button>

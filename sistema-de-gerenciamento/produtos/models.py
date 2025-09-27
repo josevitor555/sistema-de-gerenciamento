@@ -1,100 +1,3 @@
-'''from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
-
-class Categoria(models.Model):
-    nome = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.nome
-
-    # Método para criar categorias iniciais
-    @classmethod
-    def create_initial_categories(cls):
-        categorias_iniciais = []
-        for nome in categorias_iniciais:
-            cls.objects.get_or_create(nome=nome)
-    
-    @classmethod
-    def get_or_create_categoria(cls, nome):
-        return cls.objects.get_or_create(nome=nome)
-
-class Produto(models.Model):
-    nome = models.CharField(max_length=100)
-    descricao = models.TextField()
-    marca = models.CharField(max_length=100)
-    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE, related_name='produtos', default=1)
-    quantidade = models.IntegerField(default=1)
-    valor = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    imagem = models.ImageField(upload_to='produtos/', null=True, blank=True)
-
-    def __str__(self):
-        return self.nome
-
-    @classmethod
-    def get_all_products(cls):
-        return cls.objects.all()
-
-class Pedido(models.Model):
-    produtos = models.ManyToManyField(Produto, through='ItemPedido')
-
-    def total_pedido(self):
-        total = sum(item_pedido.quantidade * item_pedido.produto.valor for item_pedido in self.itempedido_set.all())
-        return total
-
-    def __str__(self):
-        return f'Pedido {self.id}'
-
-class ItemPedido(models.Model):
-    pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE)
-    produto = models.ForeignKey(Produto, on_delete=models.CASCADE)
-    quantidade = models.IntegerField(default=1)
-
-    def __str__(self):
-        return f'{self.quantidade}x {self.produto.nome}'
-
-
-# Definição do Gerenciador de Usuário
-class UsuarioManager(BaseUserManager):
-    def create_user(self, email, nome, password=None):
-        if not email:
-            raise ValueError('O endereço de e-mail deve ser fornecido')
-        email = self.normalize_email(email)
-        user = self.model(email=email, nome=nome)
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
-    def create_superuser(self, email, nome, password=None):
-        user = self.create_user(email, nome, password)
-        user.is_superuser = True
-        user.is_staff = True
-        user.save(using=self._db)
-        return user
-
-# Definição do Modelo de Usuário
-class Usuario(AbstractBaseUser):
-    email = models.EmailField(unique=True)
-    nome = models.CharField(max_length=255)
-    password = models.CharField(max_length=128)
-    is_staff = models.BooleanField(default=False)
-
-    objects = UsuarioManager()
-
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['nome']  # Adiciona o campo 'nome' como obrigatório
-
-    def __str__(self):
-        return self.email
-
-    def has_perm(self, perm, obj=None):
-        return True
-
-    def has_module_perms(self, app_label):
-        return True'''
-
-
-
-
 
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
@@ -120,14 +23,17 @@ class Categoria(models.Model):
         return cls.objects.get_or_create(nome=nome)
 
 
-# ✅ Modelo intermediário atualizado com nome correto da tabela
+# Modelo intermediário atualizado com nome correto da tabela
 class ProdutoCategoria(models.Model):
     produto = models.ForeignKey('Produto', on_delete=models.CASCADE,null=True)
     categoria = models.ForeignKey('Categoria', on_delete=models.CASCADE,null=True)
 
     class Meta:
-      
-        managed = True  # Django não gerencia essa tabela
+        # managed = True  # Remover esta linha ou definir como False se a tabela já existir e não for gerenciada pelo Django
+        pass
+
+    def __str__(self):
+        return f"{self.produto.nome} - {self.categoria.nome}"
 
 
 class Produto(models.Model):

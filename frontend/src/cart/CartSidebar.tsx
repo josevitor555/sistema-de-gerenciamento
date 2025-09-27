@@ -27,8 +27,8 @@ export function CartSidebar() {
 
         // Add each cart item to the message
         items.forEach(item => {
-            const itemPrice = item.product.price.toFixed(2);
-            message += `R$ ${itemPrice} - ${item.product.title}`;
+            const itemPrice = item.product.valor.toFixed(2);
+            message += `R$ ${itemPrice} - ${item.product.nome}`;
             if (item.quantity > 1) {
                 message += ` x${item.quantity}`;
             }
@@ -61,7 +61,7 @@ export function CartSidebar() {
                         <SheetTitle className="text-left text-lg">Seu Carrinho</SheetTitle>
                         <button
                             onClick={toggleCart}
-                            className="h-10 w-10 rounded-full bg-orange-500 hover:bg-orange-600 flex items-center justify-center transition-colors text-white"
+                            className="h-10 w-10 rounded-full bg-[#70bf2b] flex items-center justify-center transition-colors text-white"
                             aria-label="Fechar carrinho"
                         >
                             <X className="h-6 w-6" />
@@ -98,7 +98,7 @@ export function CartSidebar() {
                                     <span className="text-lg font-medium text-foreground">
                                         Total em R$
                                     </span>
-                                    <span className="text-2xl font-bold text-orange-600">
+                                    <span className="text-2xl font-bold text-[#70bf2b]">
                                         R$ {total.toFixed(2)}
                                     </span>
                                 </div>
@@ -107,7 +107,7 @@ export function CartSidebar() {
                                 <div className="space-y-3 px-2">
                                     <button
                                         onClick={handleCheckout}
-                                        className="w-full bg-orange-500 hover:bg-orange-600 text-white rounded-full py-3 text-lg font-medium"
+                                        className="w-full bg-[#70bf2b] text-white rounded-full py-3 text-lg font-medium"
                                         aria-label="Finalizar pedido no WhatsApp"
                                     >
                                         Finalizar Meu Pedido

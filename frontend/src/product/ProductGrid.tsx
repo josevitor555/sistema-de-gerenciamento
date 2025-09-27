@@ -5,17 +5,20 @@ import { CategoryFilter } from './CategoryFilter';
 
 interface ProductGridProps {
     products: Product[];
-    activeCategory: string;
+    activeCategory: number | null; // Alterado para number | null
     categories: Category[];
-    onCategoryChange: (category: string) => void;
+    onCategoryChange: (categoryId: number | null) => void; // Alterado para number | null
 }
 
 export function ProductGrid({ products, activeCategory, categories, onCategoryChange }: ProductGridProps) {
     const filteredProducts = useMemo(() => {
-        if (activeCategory === 'todos') {
+        if (activeCategory === null) {
             return products;
         }
-        return products.filter(product => product.category === activeCategory);
+        // Filtrar se o produto tem a categoria ativa (pode ter várias categorias)
+        return products.filter(product => 
+            product.categorias.some(cat => cat.id === activeCategory)
+        );
     }, [products, activeCategory]);
 
     return (
@@ -23,9 +26,9 @@ export function ProductGrid({ products, activeCategory, categories, onCategoryCh
             {/* Featured Products Section */}
             <div className="text-center">
                 <h2 className="text-3xl font-light text-muted-foreground mb-4">
-                    {activeCategory === 'todos' ? 'Produtos em Destaque' : `Nossos produtos por Categoria`}
+                    {activeCategory === null ? 'Produtos em Destaque' : `Nossos produtos por Categoria`}
                 </h2>
-                <div className="w-16 h-1 rounded-full bg-orange-500 mx-auto mb-6"></div>
+                <div className="w-16 h-1 rounded-full bg-[#70bf2b] mx-auto mb-6"></div>
 
                 {/* Category Filter - positioned to the right */}
                 <div className="flex justify-end mb-8 mt-12">

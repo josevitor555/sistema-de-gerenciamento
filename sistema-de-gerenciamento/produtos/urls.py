@@ -33,8 +33,9 @@ urlpatterns = [
     path('redefinir_senha/', views.redefinir_senha, name='redefinir_senha'),
     path('', lambda request: redirect('login'), name='redirect_login'),
 
-
-
+    # API URLs
+    path('api/categorias/', views.CategoriaListAPIView.as_view(), name='api_categoria_list'),
+    path('api/produtos/', views.ProdutoListAPIView.as_view(), name='api_produto_list'),
 ]
 
 

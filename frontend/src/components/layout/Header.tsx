@@ -21,7 +21,7 @@ export function Header({ className }: HeaderProps) {
                     <div className="flex items-center">
                         <div className="flex-shrink-0">
                             <h1 className="text-2xl font-bold text-gray-900" role="heading" aria-level={1}>
-                                Cruz <span className="text-orange-600"> Food </span>
+                                Cruz <span className="text-[#70bf2b]"> Food </span>
                             </h1>
                         </div>
                     </div>
@@ -32,14 +32,14 @@ export function Header({ className }: HeaderProps) {
                             variant="default"
                             size="lg"
                             onClick={toggleCart}
-                            className="relative w-10 h-10 rounded-full bg-orange-500 hover:bg-orange-600"
+                            className="relative w-10 h-10 rounded-full bg-[#70bf2b]"
                             aria-label={`Abrir carrinho com ${itemCount} ${itemCount === 1 ? 'item' : 'itens'}`}
                         >
                             <ShoppingCart className="h-6 w-6" />
                             {itemCount > 0 && (
                                 <Badge
                                     variant="destructive"
-                                    className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs bg-orange-500 hover:bg-orange-600"
+                                    className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs bg-[#70bf2b]"
                                 >
                                     {itemCount}
                                 </Badge>
