@@ -26,7 +26,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                         ? {
                             ...item,
                             quantity: item.quantity + 1,
-                            subtotal: (item.quantity + 1) * item.product.price
+                            subtotal: (item.quantity + 1) * item.product.valor
                         }
                         : item
                 );
@@ -36,7 +36,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                     id: `cart-${Date.now()}-${product.id}`,
                     product,
                     quantity: 1,
-                    subtotal: product.price
+                    subtotal: product.valor
                 };
                 return [...currentItems, newItem];
             }
@@ -62,7 +62,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                     ? {
                         ...item,
                         quantity,
-                        subtotal: quantity * item.product.price
+                        subtotal: quantity * item.product.valor
                     }
                     : item
             )

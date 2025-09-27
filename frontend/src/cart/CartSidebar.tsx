@@ -99,7 +99,7 @@ export function CartSidebar() {
                                         Total em R$
                                     </span>
                                     <span className="text-2xl font-bold text-[#70bf2b]">
-                                        R$ {total.toFixed(2)}
+                                        R$ {total}
                                     </span>
                                 </div>
 

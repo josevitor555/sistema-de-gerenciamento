@@ -31,7 +31,7 @@ export default function AddedToCartNotification({ product, isVisible, onClose }:
             aria-hidden="true"
           />
           <span>
-            <strong>{product.title}</strong> foi adicionado ao carrinho!
+            <strong>{product.nome}</strong> foi adicionado ao carrinho!
           </span>
         </p>
       </div>

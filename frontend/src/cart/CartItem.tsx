@@ -39,7 +39,7 @@ export function CartItem({ item }: CartItemProps) {
                     {item.product.nome}
                 </h4>
                 <p className="text-lg font-semibold text-gray-900 mt-1">
-                    R$ {item.product.valor.toFixed(2)}
+                    R$ {item.product.valor}
                 </p>
             </div>
 
